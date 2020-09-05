@@ -10,29 +10,34 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-inquirer
-  .prompt([
-    {
-      type: 'number',
-      name: 'question one',
-      message: 'What is your name?'
-    },
-    {
-      type: 'number',
-      name: 'question one',
-      message: 'how are you?'
-    }
-  ])
-  .then(answers => {
-    console.log(answers)
-  })
-  .catch(error => {
-    if(error.isTtyError) {
-      // Prompt couldn't be rendered in the current environment
-    } else {
-      // Something else when wrong
-    }
-  });
+let employees = []
+
+employees.push(new Manager('John', 1, 'john@gmail.com', '555555555'))
+
+
+// inquirer
+//   .prompt([
+//     {
+//       type: 'number',
+//       name: 'question one',
+//       message: 'What is your name?'
+//     },
+//     {
+//       type: 'number',
+//       name: 'question one',
+//       message: 'how are you?'
+//     }
+//   ])
+//   .then(answers => {
+//     console.log(answers)
+//   })
+//   .catch(error => {
+//     if(error.isTtyError) {
+//       // Prompt couldn't be rendered in the current environment
+//     } else {
+//       // Something else when wrong
+//     }
+//   });
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
@@ -43,6 +48,15 @@ inquirer
 
 // After you have your html, you're now ready to create an HTML file using the HTML
 // returned from the `render` function. Now write it to a file named `team.html` in the
+
+var stream = fs.createWriteStream(outputPath);
+
+stream.once('open', function(fd) {
+  var html = render(employees)
+
+  stream.end(html);
+});
+
 // `output` folder. You can use the variable `outputPath` above target this location.
 // Hint: you may need to check if the `output` folder exists and create it if it
 // does not.
