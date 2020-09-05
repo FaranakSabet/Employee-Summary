@@ -12,32 +12,155 @@ const render = require("./lib/htmlRenderer");
 
 let employees = []
 
-employees.push(new Manager('John', 1, 'john@gmail.com', '555555555'))
+let employeeQuestions = [
+  {
+    type: 'string',
+    name: 'name',
+    message: 'Name'
+  },
+  {
+    type: 'number',
+    name: 'id',
+    message: 'ID'
+  },
+  {
+    type: 'string',
+    name: 'email',
+    message: 'Email'
+  },
+]
 
 
-// inquirer
-//   .prompt([
-//     {
-//       type: 'number',
-//       name: 'question one',
-//       message: 'What is your name?'
-//     },
-//     {
-//       type: 'number',
-//       name: 'question one',
-//       message: 'how are you?'
-//     }
-//   ])
-//   .then(answers => {
-//     console.log(answers)
-//   })
-//   .catch(error => {
-//     if(error.isTtyError) {
-//       // Prompt couldn't be rendered in the current environment
-//     } else {
-//       // Something else when wrong
-//     }
-//   });
+
+
+const askEngineer = async function() {
+  await inquirer
+    .prompt([
+      ...employeeQuestions,
+      {
+        type: 'string',
+        name: 'github',
+        message: 'Github username'
+      }
+    ])
+    .then(answers => {
+      employees.push(new Engineer(answers.name, answers.id, answers.email, answers.github))
+
+    })
+    .catch(error => {
+      if(error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+      } else {
+        // Something else when wrong
+      }
+    });
+}
+
+const askIntern = async function () {
+  await inquirer
+    .prompt([
+      ...employeeQuestions,
+      {
+        type: 'string',
+        name: 'school',
+        message: 'School Name'
+      }
+    ])
+    .then(answers => {
+      employees.push(new Intern(answers.name, answers.id, answers.email, answers.school))
+
+    })
+    .catch(error => {
+      if(error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+      } else {
+        // Something else when wrong
+      }
+    });
+}
+
+const askManager = async function () {
+  await inquirer
+    .prompt([
+      ...employeeQuestions,
+      {
+        type: 'string',
+        name: 'officeNumber',
+        message: 'Office Number'
+      }
+    ])
+    .then(answers => {
+      employees.push(new Manager(answers.name, answers.id, answers.email, answers.officeNumber))
+    })
+    .catch(error => {
+      if(error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+      } else {
+        // Something else when wrong
+      }
+    });
+}
+
+function renderHTML() {
+  
+  var stream = fs.createWriteStream(outputPath);
+
+  stream.once('open', function(fd) {
+    var html = render(employees)
+
+    stream.end(html);
+  });
+}
+
+
+let exit = false
+
+async function menu() {
+  
+  while(exit === false) {
+      await inquirer
+        .prompt([
+          {
+            type: 'list',
+            name: 'choice',
+            message: 
+          'What type of employee would you like to add?',
+          choices: [
+            'Engineer',
+            'Intern',
+            'Manager',
+            'Done'
+          ],
+          }
+        ])
+        .then(async (answers) => {
+          if(answers.choice === 'Engineer') {
+            await askEngineer()
+          }else if(answers.choice === 'Intern') {
+            await askIntern()
+          }else if(answers.choice === 'Manager') {
+            await askManager()
+          }else if(answers.choice === 'Done') {
+            await renderHTML()
+            exit = true
+          }else {
+            console.log('I did not get that, try again')
+          }
+        })
+        .catch(error => {
+          if(error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+          } else {
+            // Something else when wrong
+          }
+        });
+    }
+}
+
+menu()
+
+
+
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
@@ -48,14 +171,6 @@ employees.push(new Manager('John', 1, 'john@gmail.com', '555555555'))
 
 // After you have your html, you're now ready to create an HTML file using the HTML
 // returned from the `render` function. Now write it to a file named `team.html` in the
-
-var stream = fs.createWriteStream(outputPath);
-
-stream.once('open', function(fd) {
-  var html = render(employees)
-
-  stream.end(html);
-});
 
 // `output` folder. You can use the variable `outputPath` above target this location.
 // Hint: you may need to check if the `output` folder exists and create it if it
